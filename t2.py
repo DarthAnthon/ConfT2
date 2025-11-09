@@ -239,12 +239,6 @@ class PackageManagerVisualizer:
         except Exception as e:
             raise ConfigError(f"Ошибка парсинга параметров: {e}")
     
-    def display_parameters(self):
-        print("ПАРАМЕТРЫ КОНФИГУРАЦИИ")
-        
-        for key, value in self.params.items():
-            print(f"{key:25}: {value}")
-    
     def display_dependencies(self, dependencies):
         if not dependencies:
             print("Прямые зависимости не найдены")
@@ -274,7 +268,6 @@ class PackageManagerVisualizer:
         try:
             self.load_config()
             self.parse_parameters()
-            self.display_parameters()
 
             dependencies = self.dependency_resolver.get_dependencies(self.params['package_name'])
             filtered_dependencies = self.apply_filter(dependencies, self.params['filter_substring'])
@@ -303,3 +296,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
