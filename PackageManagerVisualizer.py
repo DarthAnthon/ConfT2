@@ -5,7 +5,8 @@ from pathlib import Path
 from urllib.parse import urlparse
 import MavenDependencyResolver as MDR
 from collections import deque
-#import graphviz
+import graphviz
+import webbrowser
 
 class ConfigError(Exception):
     pass
@@ -212,36 +213,66 @@ class PackageManagerVisualizer:
                 print(f"   {cycle}")
         return dependency_graph
     
-    """
     def create_dependency_graph(self, dependency_graph, output_filename):
         try:
+            print(f"\nСоздание визуализации графа зависимостей...")
+
             dot = graphviz.Digraph(comment='Dependency Graph')
-            dot.attr(rankdir='TB', size='12,8')
+
+            dot.attr(rankdir='TB', size='12,8', ratio='compress')
+            dot.attr('node', shape='box', style='filled', fontname='Arial', fontsize='10')
+            dot.attr('edge', arrowhead='vee', arrowsize='0.8')
             
-            for package, dependencies in dependency_graph.items():
-                if package == self.params['package_name']:
-                    dot.node(package, package, shape='ellipse', style='filled', 
-                            color='lightblue2', fontsize='12', fontname='Arial')
+            all_nodes = set(dependency_graph.keys())
+            for deps in dependency_graph.values():
+                for dep in deps:
+                    all_nodes.add(dep['full_name'])
+            
+            for node in all_nodes:
+                if node == self.params['package_name']:
+                    node = node.replace(':', '.')
+                    dot.node(node, node, shape='ellipse', fillcolor='lightblue2', 
+                            color='blue', fontsize='12')
+                elif any(node in dep_list for p, dep_list in dependency_graph.items() 
+                    for dep in dep_list if dep['full_name'] == node and p in dependency_graph.get(node, [])):
+                    node = node.replace(':', '.')
+                    dot.node(node, node, fillcolor='lightcoral', color='red')
                 else:
-                    dot.node(package, package, shape='box', style='filled',
-                            color='lightgreen', fontsize='10', fontname='Arial')
-                
+                    node = node.replace(':', '.')
+                    dot.node(node, node, fillcolor='lightgreen', color='darkgreen')
+            
+            edges_added = set()
+            for package, dependencies in dependency_graph.items():
                 for dep in dependencies:
                     dep_name = dep['full_name']
-                    dot.edge(package, dep_name)
-            
-            file_format = Path(output_filename).suffix[1:].lower()
+                    edge = (package, dep_name)
+                    if edge not in edges_added:
+                        dot.edge(package.replace(':', '.'), dep_name.replace(':', '.'), color='red', style='bold')
+                        edges_added.add(edge)
+            file_format = 'svg'
             base_name = Path(output_filename).stem
             
+            print(f"Сохранение графа в формате {file_format}...")
             output_path = dot.render(filename=base_name, format=file_format, cleanup=True)
             
-            print(f"\nПолный граф зависимостей сохранен в файл: {output_filename}")
-            print(f"Полный путь: {output_path}")
+            print(f"✓ Визуализация графа сохранена в файл: {base_name}.{file_format}")
+            print(f"✓ Полный путь: {output_path}")
+
+            if os.path.exists(output_path):
+                webbrowser.open(output_path)
+            else:
+                print(f"Файл {output_path} не найден")
+            """
+            dot_file = f"{base_name}.dot"
+            dot.save(dot_file)
+            print(f"✓ Текстовое представление Graphviz сохранено в: {dot_file}")
+            """
             
+            return output_path
+                
         except Exception as e:
             print(f"Ошибка при создании графа: {e}", file=sys.stderr)
             raise
-    """
 
     def display_dependency_statistics(self, dependency_graph):
         total_packages = len(dependency_graph)
@@ -296,8 +327,13 @@ class PackageManagerVisualizer:
             full_dependency_graph = self.build_transitive_dependency_graph(self.params['package_name'])
             self.display_dependency_statistics(full_dependency_graph)
 
-            name = "test:F:1.0"
-            self.display_back_dependencies(full_dependency_graph, name)
+            os.environ["PATH"] += os.pathsep + r'C:\Program Files\Graphviz\bin'
+            if full_dependency_graph:
+                self.create_dependency_graph(full_dependency_graph, self.params['output_filename'])
+            else:
+                print("Нет зависимостей для визуализации")
+            #name = "test:F:1.0"
+            #self.display_back_dependencies(full_dependency_graph, name)
 
         except ConfigError as e:
             print(f"Ошибка конфигурации: {e}", file=sys.stderr)
