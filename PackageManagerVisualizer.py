@@ -16,7 +16,6 @@ class PackageManagerVisualizer:
         self.config = configparser.ConfigParser()
         self.params = {}
         self.dependency_resolver = None
-        self.full_dependency_cache = {}
 
     def load_config(self):
         if not os.path.exists(self.config_file):
@@ -257,8 +256,33 @@ class PackageManagerVisualizer:
         print(f"Фильтр подстроки: '{self.params['filter_substring']}'")
         
         print(f"\n=== СТРУКТУРА ГРАФА ===")
+        print(dependency_graph)
         for package, deps in dependency_graph.items():
             print(f"{package} -> {[d['full_name'] for d in deps]}")
+
+    def display_back_dependencies(self, dependency_graph, target_package):
+        if not dependency_graph:
+            print("Граф зависимостей еще не построен. Сначала выполните анализ пакета.")
+            return []
+        
+        reverse_deps = []
+        
+        for package, dependencies in dependency_graph.items():
+            for dep in dependencies:
+                if dep['full_name'] == target_package:
+                    reverse_deps.append(package)
+                    break
+
+        if not reverse_deps:
+            print(f"Обратные зависимости для пакета '{target_package}' не найдены")
+            return
+        
+        print(f"\nОБРАТНЫЕ ЗАВИСИМОСТИ ДЛЯ: {target_package}")
+        
+        for i, package in enumerate(reverse_deps, 1):
+            print(f"{i:2}. {package}")
+        
+        print(f"Всего обратных зависимостей: {len(reverse_deps)}")
 
     def run(self):
         try:
@@ -271,6 +295,9 @@ class PackageManagerVisualizer:
             
             full_dependency_graph = self.build_transitive_dependency_graph(self.params['package_name'])
             self.display_dependency_statistics(full_dependency_graph)
+
+            name = "test:F:1.0"
+            self.display_back_dependencies(full_dependency_graph, name)
 
         except ConfigError as e:
             print(f"Ошибка конфигурации: {e}", file=sys.stderr)
