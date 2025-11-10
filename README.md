@@ -1,7 +1,8 @@
 # ConfT2
-# Этап 2. Сбор данных 
+# Этап 3. Основные операции 
 ## 1. Общее описание. 
-Минимальное CLI-приложение для визуализации графа зависимостей пакетов.
+Минимальное CLI-приложение для визуализации графа зависимостей пакетов. Включает реализацию основной логики получения данных о зависимостях для их 
+дальнейшего анализа и визуализации, а также построение графа и основные операции над ним.
 
 ## 2. Описание всех функций и настроек. 
 
@@ -10,6 +11,10 @@
 __init__(self, repository_url) - инициализация с указанием url адреса
 
 _download_pom(self, group_id, artifact_id, version) - скачивание pom файла
+
+_load_test_dependencies(self, group_id, artifact_id, version) - загрузка зависимостей из тестового файла
+
+_create_test_pom_content(self, package_name, dependencies) - создание имитации pom файла для тестового режима
 
 _parse_dependencies_from_pom(self, pom_content) - парсинг pom файла
 
@@ -22,7 +27,13 @@ load_config() - загрузка конфигурации из INI-файла
 
 parse_parameters() - парсинг и валидация параметров
 
-display_parameters() - вывод параметров в формате ключ-значение
+display_dependencies(self, dependencies) - вывод зависимостей
+
+apply_filter(self, dependencies, filter_substring) - применение фильтра к зависимостям
+
+build_transitive_dependency_graph(self, root_package) - построение графа транзитивных зависимостей
+
+display_dependency_statistics(self, dependency_graph) - вывод графа
 
 run() - основной метод запуска приложения
 
@@ -38,18 +49,22 @@ validate_filter_substring(substring) - проверка корректности
 
 ### Конфигурационные параметры
 
-package_name = org.springframework.boot:spring-boot-starter-web:2.7.0 - Имя анализируемого пакета
+package_name - Имя анализируемого пакета
 
-repository_url = https://repo1.maven.org/maven2 - URL-адрес репозитория
+repository_url - URL-адрес репозитория
 
-test_mode = false - Режим работы с тестовым репозиторием (true/false)
+test_mode - Режим работы с тестовым репозиторием (true/false)
 
-output_filename = dependency_graph.png - Имя сгенерированного файла с изображением графа
+output_filename - Имя сгенерированного файла с изображением графа
 
-filter_substring =  - Подстрока для фильтрации пакетов (опционально)
+filter_substring - Подстрока для фильтрации пакетов (опционально)
 ## 3. Описание команд для сборки проекта и запуска тестов. 
 
 python t2.py config.ini - Запуск с указанием конфиг-файла
+
+python t2.py config_test.ini - Запуск с указанием конфиг-файла для тестирования
 ## 4. Примеры использования.
-<img width="1204" height="380" alt="image" src="https://github.com/user-attachments/assets/bc50c6e0-2a75-4bde-9079-2280eab52b63" />
+<img width="1060" height="863" alt="image" src="https://github.com/user-attachments/assets/4c72415e-b016-475b-9b07-0e846ecc9220" />
+<img width="1609" height="207" alt="image" src="https://github.com/user-attachments/assets/517f22ac-6d30-4ca2-9cc4-db0adf26b849" />
+
 
