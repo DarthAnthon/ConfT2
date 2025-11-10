@@ -1,8 +1,8 @@
 # ConfT2
-# Этап 3. Основные операции 
+# Этап 4. Дополнительные операции
 ## 1. Общее описание. 
 Минимальное CLI-приложение для визуализации графа зависимостей пакетов. Включает реализацию основной логики получения данных о зависимостях для их 
-дальнейшего анализа и визуализации, а также построение графа и основные операции над ним.
+дальнейшего анализа и визуализации, а также построение графа и основные и дополнительные операции над ним.
 
 ## 2. Описание всех функций и настроек. 
 
@@ -35,6 +35,8 @@ build_transitive_dependency_graph(self, root_package) - построение г�
 
 display_dependency_statistics(self, dependency_graph) - вывод графа
 
+display_back_dependencies(self, dependency_graph, target_package) - получение и вывод обратных зависимостей
+
 run() - основной метод запуска приложения
 
 validate_package_name(package_name) - проверка корректности имени пакета
@@ -64,7 +66,7 @@ python t2.py config.ini - Запуск с указанием конфиг-фай
 
 python t2.py config_test.ini - Запуск с указанием конфиг-файла для тестирования
 ## 4. Примеры использования.
-<img width="1060" height="863" alt="image" src="https://github.com/user-attachments/assets/4c72415e-b016-475b-9b07-0e846ecc9220" />
-<img width="1609" height="207" alt="image" src="https://github.com/user-attachments/assets/517f22ac-6d30-4ca2-9cc4-db0adf26b849" />
+<img width="1611" height="883" alt="image" src="https://github.com/user-attachments/assets/c0aa4580-cdf2-411a-8bf1-cf04752a879b" />
+
 
 
